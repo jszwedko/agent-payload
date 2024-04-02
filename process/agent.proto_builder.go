@@ -2595,6 +2595,63 @@ func (x *CollectorNetworkPolicyBuilder) AddTags(v string) {
 	x.writer.Write(x.scratch)
 }
 
+type CollectorLimitRangeBuilder struct {
+	writer            io.Writer
+	buf               bytes.Buffer
+	scratch           []byte
+	limitRangeBuilder LimitRangeBuilder
+}
+
+func NewCollectorLimitRangeBuilder(writer io.Writer) *CollectorLimitRangeBuilder {
+	return &CollectorLimitRangeBuilder{
+		writer: writer,
+	}
+}
+func (x *CollectorLimitRangeBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *CollectorLimitRangeBuilder) SetClusterName(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *CollectorLimitRangeBuilder) SetClusterId(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x12)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *CollectorLimitRangeBuilder) SetGroupId(v int32) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x18)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+func (x *CollectorLimitRangeBuilder) SetGroupSize(v int32) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x20)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+func (x *CollectorLimitRangeBuilder) AddLimitRanges(cb func(w *LimitRangeBuilder)) {
+	x.buf.Reset()
+	x.limitRangeBuilder.writer = &x.buf
+	x.limitRangeBuilder.scratch = x.scratch
+	cb(&x.limitRangeBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x2a)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *CollectorLimitRangeBuilder) AddTags(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x32)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+
 type CollectorStatusBuilder struct {
 	writer  io.Writer
 	buf     bytes.Buffer
@@ -10997,6 +11054,294 @@ func (x *NetworkPolicyPortBuilder) SetPort(v int32) {
 func (x *NetworkPolicyPortBuilder) SetEndPort(v int32) {
 	x.scratch = x.scratch[:0]
 	x.scratch = protowire.AppendVarint(x.scratch, 0x18)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+
+type LimitRangeBuilder struct {
+	writer                io.Writer
+	buf                   bytes.Buffer
+	scratch               []byte
+	metadataBuilder       MetadataBuilder
+	limitRangeSpecBuilder LimitRangeSpecBuilder
+}
+
+func NewLimitRangeBuilder(writer io.Writer) *LimitRangeBuilder {
+	return &LimitRangeBuilder{
+		writer: writer,
+	}
+}
+func (x *LimitRangeBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *LimitRangeBuilder) SetMetadata(cb func(w *MetadataBuilder)) {
+	x.buf.Reset()
+	x.metadataBuilder.writer = &x.buf
+	x.metadataBuilder.scratch = x.scratch
+	cb(&x.metadataBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0xa)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *LimitRangeBuilder) SetSpec(cb func(w *LimitRangeSpecBuilder)) {
+	x.buf.Reset()
+	x.limitRangeSpecBuilder.writer = &x.buf
+	x.limitRangeSpecBuilder.scratch = x.scratch
+	cb(&x.limitRangeSpecBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x12)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *LimitRangeBuilder) AddTags(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x1a)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+
+type LimitRangeSpecBuilder struct {
+	writer                io.Writer
+	buf                   bytes.Buffer
+	scratch               []byte
+	limitRangeItemBuilder LimitRangeItemBuilder
+}
+
+func NewLimitRangeSpecBuilder(writer io.Writer) *LimitRangeSpecBuilder {
+	return &LimitRangeSpecBuilder{
+		writer: writer,
+	}
+}
+func (x *LimitRangeSpecBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *LimitRangeSpecBuilder) AddLimits(cb func(w *LimitRangeItemBuilder)) {
+	x.buf.Reset()
+	x.limitRangeItemBuilder.writer = &x.buf
+	x.limitRangeItemBuilder.scratch = x.scratch
+	cb(&x.limitRangeItemBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0xa)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+
+type LimitRangeItemBuilder struct {
+	writer                                          io.Writer
+	buf                                             bytes.Buffer
+	scratch                                         []byte
+	limitRangeItem_DefaultEntryBuilder              LimitRangeItem_DefaultEntryBuilder
+	limitRangeItem_DefaultRequestEntryBuilder       LimitRangeItem_DefaultRequestEntryBuilder
+	limitRangeItem_MaxEntryBuilder                  LimitRangeItem_MaxEntryBuilder
+	limitRangeItem_MinEntryBuilder                  LimitRangeItem_MinEntryBuilder
+	limitRangeItem_MaxLimitRequestRatioEntryBuilder LimitRangeItem_MaxLimitRequestRatioEntryBuilder
+}
+
+func NewLimitRangeItemBuilder(writer io.Writer) *LimitRangeItemBuilder {
+	return &LimitRangeItemBuilder{
+		writer: writer,
+	}
+}
+func (x *LimitRangeItemBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *LimitRangeItemBuilder) SetType(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *LimitRangeItemBuilder) AddDefault(cb func(w *LimitRangeItem_DefaultEntryBuilder)) {
+	x.buf.Reset()
+	x.limitRangeItem_DefaultEntryBuilder.writer = &x.buf
+	x.limitRangeItem_DefaultEntryBuilder.scratch = x.scratch
+	cb(&x.limitRangeItem_DefaultEntryBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x12)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *LimitRangeItemBuilder) AddDefaultRequest(cb func(w *LimitRangeItem_DefaultRequestEntryBuilder)) {
+	x.buf.Reset()
+	x.limitRangeItem_DefaultRequestEntryBuilder.writer = &x.buf
+	x.limitRangeItem_DefaultRequestEntryBuilder.scratch = x.scratch
+	cb(&x.limitRangeItem_DefaultRequestEntryBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x1a)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *LimitRangeItemBuilder) AddMax(cb func(w *LimitRangeItem_MaxEntryBuilder)) {
+	x.buf.Reset()
+	x.limitRangeItem_MaxEntryBuilder.writer = &x.buf
+	x.limitRangeItem_MaxEntryBuilder.scratch = x.scratch
+	cb(&x.limitRangeItem_MaxEntryBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x22)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *LimitRangeItemBuilder) AddMin(cb func(w *LimitRangeItem_MinEntryBuilder)) {
+	x.buf.Reset()
+	x.limitRangeItem_MinEntryBuilder.writer = &x.buf
+	x.limitRangeItem_MinEntryBuilder.scratch = x.scratch
+	cb(&x.limitRangeItem_MinEntryBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x2a)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *LimitRangeItemBuilder) AddMaxLimitRequestRatio(cb func(w *LimitRangeItem_MaxLimitRequestRatioEntryBuilder)) {
+	x.buf.Reset()
+	x.limitRangeItem_MaxLimitRequestRatioEntryBuilder.writer = &x.buf
+	x.limitRangeItem_MaxLimitRequestRatioEntryBuilder.scratch = x.scratch
+	cb(&x.limitRangeItem_MaxLimitRequestRatioEntryBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x32)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+
+type LimitRangeItem_DefaultEntryBuilder struct {
+	writer  io.Writer
+	buf     bytes.Buffer
+	scratch []byte
+}
+
+func NewLimitRangeItem_DefaultEntryBuilder(writer io.Writer) *LimitRangeItem_DefaultEntryBuilder {
+	return &LimitRangeItem_DefaultEntryBuilder{
+		writer: writer,
+	}
+}
+func (x *LimitRangeItem_DefaultEntryBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *LimitRangeItem_DefaultEntryBuilder) SetKey(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *LimitRangeItem_DefaultEntryBuilder) SetValue(v int64) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x10)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+
+type LimitRangeItem_DefaultRequestEntryBuilder struct {
+	writer  io.Writer
+	buf     bytes.Buffer
+	scratch []byte
+}
+
+func NewLimitRangeItem_DefaultRequestEntryBuilder(writer io.Writer) *LimitRangeItem_DefaultRequestEntryBuilder {
+	return &LimitRangeItem_DefaultRequestEntryBuilder{
+		writer: writer,
+	}
+}
+func (x *LimitRangeItem_DefaultRequestEntryBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *LimitRangeItem_DefaultRequestEntryBuilder) SetKey(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *LimitRangeItem_DefaultRequestEntryBuilder) SetValue(v int64) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x10)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+
+type LimitRangeItem_MaxEntryBuilder struct {
+	writer  io.Writer
+	buf     bytes.Buffer
+	scratch []byte
+}
+
+func NewLimitRangeItem_MaxEntryBuilder(writer io.Writer) *LimitRangeItem_MaxEntryBuilder {
+	return &LimitRangeItem_MaxEntryBuilder{
+		writer: writer,
+	}
+}
+func (x *LimitRangeItem_MaxEntryBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *LimitRangeItem_MaxEntryBuilder) SetKey(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *LimitRangeItem_MaxEntryBuilder) SetValue(v int64) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x10)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+
+type LimitRangeItem_MinEntryBuilder struct {
+	writer  io.Writer
+	buf     bytes.Buffer
+	scratch []byte
+}
+
+func NewLimitRangeItem_MinEntryBuilder(writer io.Writer) *LimitRangeItem_MinEntryBuilder {
+	return &LimitRangeItem_MinEntryBuilder{
+		writer: writer,
+	}
+}
+func (x *LimitRangeItem_MinEntryBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *LimitRangeItem_MinEntryBuilder) SetKey(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *LimitRangeItem_MinEntryBuilder) SetValue(v int64) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x10)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+
+type LimitRangeItem_MaxLimitRequestRatioEntryBuilder struct {
+	writer  io.Writer
+	buf     bytes.Buffer
+	scratch []byte
+}
+
+func NewLimitRangeItem_MaxLimitRequestRatioEntryBuilder(writer io.Writer) *LimitRangeItem_MaxLimitRequestRatioEntryBuilder {
+	return &LimitRangeItem_MaxLimitRequestRatioEntryBuilder{
+		writer: writer,
+	}
+}
+func (x *LimitRangeItem_MaxLimitRequestRatioEntryBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *LimitRangeItem_MaxLimitRequestRatioEntryBuilder) SetKey(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *LimitRangeItem_MaxLimitRequestRatioEntryBuilder) SetValue(v int64) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x10)
 	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
 	x.writer.Write(x.scratch)
 }

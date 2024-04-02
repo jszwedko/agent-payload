@@ -417,6 +417,15 @@ message CollectorNetworkPolicy {
 	repeated string tags = 6;
 }
 
+message CollectorLimitRange {
+    string clusterName = 1;
+    string clusterId = 2;
+    int32 groupId = 3;
+    int32 groupSize = 4;
+    repeated LimitRange limitRanges = 5;
+    repeated string tags = 6;
+}
+
 //
 // Models
 //
@@ -768,6 +777,7 @@ enum OrchestratorResource {
     VERTICALPODAUTOSCALER = 22;
     HORIZONTALPODAUTOSCALER = 23;
     NETWORKPOLICY = 24;
+    LIMITRANGE = 25;
     ECSTASK = 150;
 }
 
@@ -1891,4 +1901,23 @@ message NetworkPolicyPort {
 	string protocol = 1;
 	int32 port = 2;
 	int32 endPort = 3;
+}
+
+message LimitRange {
+    Metadata metadata = 1;
+    LimitRangeSpec spec = 2;
+	repeated string tags = 3;
+}
+
+message LimitRangeSpec {
+    repeated LimitRangeItem limits = 1;
+}
+
+message LimitRangeItem {
+    string type = 1;
+    map<string, int64> default = 2;
+    map<string, int64> defaultRequest = 3;
+    map<string, int64> max = 4;
+    map<string, int64> min = 5;
+    map<string, int64> maxLimitRequestRatio = 6;
 }
