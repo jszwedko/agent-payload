@@ -426,6 +426,15 @@ message CollectorLimitRange {
     repeated string tags = 6;
 }
 
+message CollectorStorageClass {
+    string clusterName = 1;
+    string clusterId = 2;
+    int32 groupId = 3;
+    int32 groupSize = 4;
+    repeated StorageClass storageClasses = 5;
+    repeated string tags = 6;
+}
+
 //
 // Models
 //
@@ -778,6 +787,7 @@ enum OrchestratorResource {
     HORIZONTALPODAUTOSCALER = 23;
     NETWORKPOLICY = 24;
     LIMITRANGE = 25;
+    STORAGECLASS = 26;
     ECSTASK = 150;
 }
 
@@ -1906,7 +1916,8 @@ message NetworkPolicyPort {
 message LimitRange {
     Metadata metadata = 1;
     LimitRangeSpec spec = 2;
-	repeated string tags = 3;
+    repeated string limitTypes = 3;
+    repeated string tags = 4;
 }
 
 message LimitRangeSpec {
@@ -1920,4 +1931,25 @@ message LimitRangeItem {
     map<string, int64> max = 4;
     map<string, int64> min = 5;
     map<string, int64> maxLimitRequestRatio = 6;
+}
+
+message StorageClass {
+    Metadata metadata = 1;
+    string provisionner = 2;
+    map<string, string> parameters = 3;
+    string reclaimPolicy = 4;
+    repeated string mountOptions = 5;
+    bool allowVolumeExpansion = 6;
+    repeated StorageClassTopology allowedTopologies = 7;
+    string volumeBindingMode = 8;
+    repeated string tags = 9;
+}
+
+message StorageClassTopology {
+    repeated TopologyLabelSelector topologySelectors = 1;
+}
+
+message TopologyLabelSelector {
+    string key = 1;
+    repeated string values = 2;
 }

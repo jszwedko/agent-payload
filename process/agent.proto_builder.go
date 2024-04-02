@@ -2652,6 +2652,63 @@ func (x *CollectorLimitRangeBuilder) AddTags(v string) {
 	x.writer.Write(x.scratch)
 }
 
+type CollectorStorageClassBuilder struct {
+	writer              io.Writer
+	buf                 bytes.Buffer
+	scratch             []byte
+	storageClassBuilder StorageClassBuilder
+}
+
+func NewCollectorStorageClassBuilder(writer io.Writer) *CollectorStorageClassBuilder {
+	return &CollectorStorageClassBuilder{
+		writer: writer,
+	}
+}
+func (x *CollectorStorageClassBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *CollectorStorageClassBuilder) SetClusterName(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *CollectorStorageClassBuilder) SetClusterId(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x12)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *CollectorStorageClassBuilder) SetGroupId(v int32) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x18)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+func (x *CollectorStorageClassBuilder) SetGroupSize(v int32) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x20)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+func (x *CollectorStorageClassBuilder) AddStorageClasses(cb func(w *StorageClassBuilder)) {
+	x.buf.Reset()
+	x.storageClassBuilder.writer = &x.buf
+	x.storageClassBuilder.scratch = x.scratch
+	cb(&x.storageClassBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x2a)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *CollectorStorageClassBuilder) AddTags(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x32)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+
 type CollectorStatusBuilder struct {
 	writer  io.Writer
 	buf     bytes.Buffer
@@ -11095,9 +11152,15 @@ func (x *LimitRangeBuilder) SetSpec(cb func(w *LimitRangeSpecBuilder)) {
 	x.writer.Write(x.scratch)
 	x.writer.Write(x.buf.Bytes())
 }
-func (x *LimitRangeBuilder) AddTags(v string) {
+func (x *LimitRangeBuilder) AddLimitTypes(v string) {
 	x.scratch = x.scratch[:0]
 	x.scratch = protowire.AppendVarint(x.scratch, 0x1a)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *LimitRangeBuilder) AddTags(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x22)
 	x.scratch = protowire.AppendString(x.scratch, v)
 	x.writer.Write(x.scratch)
 }
@@ -11343,5 +11406,174 @@ func (x *LimitRangeItem_MaxLimitRequestRatioEntryBuilder) SetValue(v int64) {
 	x.scratch = x.scratch[:0]
 	x.scratch = protowire.AppendVarint(x.scratch, 0x10)
 	x.scratch = protowire.AppendVarint(x.scratch, uint64(v))
+	x.writer.Write(x.scratch)
+}
+
+type StorageClassBuilder struct {
+	writer                              io.Writer
+	buf                                 bytes.Buffer
+	scratch                             []byte
+	metadataBuilder                     MetadataBuilder
+	storageClass_ParametersEntryBuilder StorageClass_ParametersEntryBuilder
+	storageClassTopologyBuilder         StorageClassTopologyBuilder
+}
+
+func NewStorageClassBuilder(writer io.Writer) *StorageClassBuilder {
+	return &StorageClassBuilder{
+		writer: writer,
+	}
+}
+func (x *StorageClassBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *StorageClassBuilder) SetMetadata(cb func(w *MetadataBuilder)) {
+	x.buf.Reset()
+	x.metadataBuilder.writer = &x.buf
+	x.metadataBuilder.scratch = x.scratch
+	cb(&x.metadataBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0xa)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *StorageClassBuilder) SetProvisionner(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x12)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *StorageClassBuilder) AddParameters(cb func(w *StorageClass_ParametersEntryBuilder)) {
+	x.buf.Reset()
+	x.storageClass_ParametersEntryBuilder.writer = &x.buf
+	x.storageClass_ParametersEntryBuilder.scratch = x.scratch
+	cb(&x.storageClass_ParametersEntryBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x1a)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *StorageClassBuilder) SetReclaimPolicy(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x22)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *StorageClassBuilder) AddMountOptions(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x2a)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *StorageClassBuilder) SetAllowVolumeExpansion(v bool) {
+	if v {
+		x.scratch = protowire.AppendVarint(x.scratch[:0], 0x30)
+		x.scratch = protowire.AppendVarint(x.scratch, 1)
+		x.writer.Write(x.scratch)
+	}
+}
+func (x *StorageClassBuilder) AddAllowedTopologies(cb func(w *StorageClassTopologyBuilder)) {
+	x.buf.Reset()
+	x.storageClassTopologyBuilder.writer = &x.buf
+	x.storageClassTopologyBuilder.scratch = x.scratch
+	cb(&x.storageClassTopologyBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x3a)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+func (x *StorageClassBuilder) SetVolumeBindingMode(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x42)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *StorageClassBuilder) AddTags(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x4a)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+
+type StorageClass_ParametersEntryBuilder struct {
+	writer  io.Writer
+	buf     bytes.Buffer
+	scratch []byte
+}
+
+func NewStorageClass_ParametersEntryBuilder(writer io.Writer) *StorageClass_ParametersEntryBuilder {
+	return &StorageClass_ParametersEntryBuilder{
+		writer: writer,
+	}
+}
+func (x *StorageClass_ParametersEntryBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *StorageClass_ParametersEntryBuilder) SetKey(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *StorageClass_ParametersEntryBuilder) SetValue(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x12)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+
+type StorageClassTopologyBuilder struct {
+	writer                       io.Writer
+	buf                          bytes.Buffer
+	scratch                      []byte
+	topologyLabelSelectorBuilder TopologyLabelSelectorBuilder
+}
+
+func NewStorageClassTopologyBuilder(writer io.Writer) *StorageClassTopologyBuilder {
+	return &StorageClassTopologyBuilder{
+		writer: writer,
+	}
+}
+func (x *StorageClassTopologyBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *StorageClassTopologyBuilder) AddTopologySelectors(cb func(w *TopologyLabelSelectorBuilder)) {
+	x.buf.Reset()
+	x.topologyLabelSelectorBuilder.writer = &x.buf
+	x.topologyLabelSelectorBuilder.scratch = x.scratch
+	cb(&x.topologyLabelSelectorBuilder)
+	x.scratch = protowire.AppendVarint(x.scratch[:0], 0xa)
+	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
+	x.writer.Write(x.scratch)
+	x.writer.Write(x.buf.Bytes())
+}
+
+type TopologyLabelSelectorBuilder struct {
+	writer  io.Writer
+	buf     bytes.Buffer
+	scratch []byte
+}
+
+func NewTopologyLabelSelectorBuilder(writer io.Writer) *TopologyLabelSelectorBuilder {
+	return &TopologyLabelSelectorBuilder{
+		writer: writer,
+	}
+}
+func (x *TopologyLabelSelectorBuilder) Reset(writer io.Writer) {
+	x.buf.Reset()
+	x.writer = writer
+}
+func (x *TopologyLabelSelectorBuilder) SetKey(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0xa)
+	x.scratch = protowire.AppendString(x.scratch, v)
+	x.writer.Write(x.scratch)
+}
+func (x *TopologyLabelSelectorBuilder) AddValues(v string) {
+	x.scratch = x.scratch[:0]
+	x.scratch = protowire.AppendVarint(x.scratch, 0x12)
+	x.scratch = protowire.AppendString(x.scratch, v)
 	x.writer.Write(x.scratch)
 }
