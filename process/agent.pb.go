@@ -15598,6 +15598,7 @@ func (m *NetworkPolicyPort) GetEndPort() int32 {
 	return 0
 }
 
+// https://github.com/kubernetes/api/blob/v0.23.15/core/v1/types.go#L5800
 type LimitRange struct {
 	Metadata   *Metadata       `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	Spec       *LimitRangeSpec `protobuf:"bytes,2,opt,name=spec,proto3" json:"spec,omitempty"`
@@ -15794,6 +15795,7 @@ func (m *LimitRangeItem) GetMaxLimitRequestRatio() map[string]int64 {
 	return nil
 }
 
+// https://github.com/kubernetes/api/blob/v0.23.15/storage/v1/types.go#L33
 type StorageClass struct {
 	Metadata             *Metadata               `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	Provisionner         string                  `protobuf:"bytes,2,opt,name=provisionner,proto3" json:"provisionner,omitempty"`

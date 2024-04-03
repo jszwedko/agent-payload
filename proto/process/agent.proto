@@ -1913,6 +1913,7 @@ message NetworkPolicyPort {
 	int32 endPort = 3;
 }
 
+// https://github.com/kubernetes/api/blob/v0.23.15/core/v1/types.go#L5800
 message LimitRange {
     Metadata metadata = 1;
     LimitRangeSpec spec = 2;
@@ -1933,6 +1934,7 @@ message LimitRangeItem {
     map<string, int64> maxLimitRequestRatio = 6;
 }
 
+// https://github.com/kubernetes/api/blob/v0.23.15/storage/v1/types.go#L33
 message StorageClass {
     Metadata metadata = 1;
     string provisionner = 2;
