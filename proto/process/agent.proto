@@ -1937,18 +1937,18 @@ message LimitRangeItem {
 // https://github.com/kubernetes/api/blob/v0.23.15/storage/v1/types.go#L33
 message StorageClass {
     Metadata metadata = 1;
-    string provisionner = 2;
+    string provisioner = 2;
     map<string, string> parameters = 3;
     string reclaimPolicy = 4;
     repeated string mountOptions = 5;
     bool allowVolumeExpansion = 6;
-    repeated StorageClassTopology allowedTopologies = 7;
+    StorageClassTopologies allowedTopologies = 7;
     string volumeBindingMode = 8;
     repeated string tags = 9;
 }
 
-message StorageClassTopology {
-    repeated TopologyLabelSelector topologySelectors = 1;
+message StorageClassTopologies {
+    repeated TopologyLabelSelector labelSelectors = 1;
 }
 
 message TopologyLabelSelector {

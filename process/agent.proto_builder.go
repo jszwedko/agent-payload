@@ -11415,7 +11415,7 @@ type StorageClassBuilder struct {
 	scratch                             []byte
 	metadataBuilder                     MetadataBuilder
 	storageClass_ParametersEntryBuilder StorageClass_ParametersEntryBuilder
-	storageClassTopologyBuilder         StorageClassTopologyBuilder
+	storageClassTopologiesBuilder       StorageClassTopologiesBuilder
 }
 
 func NewStorageClassBuilder(writer io.Writer) *StorageClassBuilder {
@@ -11437,7 +11437,7 @@ func (x *StorageClassBuilder) SetMetadata(cb func(w *MetadataBuilder)) {
 	x.writer.Write(x.scratch)
 	x.writer.Write(x.buf.Bytes())
 }
-func (x *StorageClassBuilder) SetProvisionner(v string) {
+func (x *StorageClassBuilder) SetProvisioner(v string) {
 	x.scratch = x.scratch[:0]
 	x.scratch = protowire.AppendVarint(x.scratch, 0x12)
 	x.scratch = protowire.AppendString(x.scratch, v)
@@ -11472,11 +11472,11 @@ func (x *StorageClassBuilder) SetAllowVolumeExpansion(v bool) {
 		x.writer.Write(x.scratch)
 	}
 }
-func (x *StorageClassBuilder) AddAllowedTopologies(cb func(w *StorageClassTopologyBuilder)) {
+func (x *StorageClassBuilder) SetAllowedTopologies(cb func(w *StorageClassTopologiesBuilder)) {
 	x.buf.Reset()
-	x.storageClassTopologyBuilder.writer = &x.buf
-	x.storageClassTopologyBuilder.scratch = x.scratch
-	cb(&x.storageClassTopologyBuilder)
+	x.storageClassTopologiesBuilder.writer = &x.buf
+	x.storageClassTopologiesBuilder.scratch = x.scratch
+	cb(&x.storageClassTopologiesBuilder)
 	x.scratch = protowire.AppendVarint(x.scratch[:0], 0x3a)
 	x.scratch = protowire.AppendVarint(x.scratch, uint64(x.buf.Len()))
 	x.writer.Write(x.scratch)
@@ -11523,23 +11523,23 @@ func (x *StorageClass_ParametersEntryBuilder) SetValue(v string) {
 	x.writer.Write(x.scratch)
 }
 
-type StorageClassTopologyBuilder struct {
+type StorageClassTopologiesBuilder struct {
 	writer                       io.Writer
 	buf                          bytes.Buffer
 	scratch                      []byte
 	topologyLabelSelectorBuilder TopologyLabelSelectorBuilder
 }
 
-func NewStorageClassTopologyBuilder(writer io.Writer) *StorageClassTopologyBuilder {
-	return &StorageClassTopologyBuilder{
+func NewStorageClassTopologiesBuilder(writer io.Writer) *StorageClassTopologiesBuilder {
+	return &StorageClassTopologiesBuilder{
 		writer: writer,
 	}
 }
-func (x *StorageClassTopologyBuilder) Reset(writer io.Writer) {
+func (x *StorageClassTopologiesBuilder) Reset(writer io.Writer) {
 	x.buf.Reset()
 	x.writer = writer
 }
-func (x *StorageClassTopologyBuilder) AddTopologySelectors(cb func(w *TopologyLabelSelectorBuilder)) {
+func (x *StorageClassTopologiesBuilder) AddLabelSelectors(cb func(w *TopologyLabelSelectorBuilder)) {
 	x.buf.Reset()
 	x.topologyLabelSelectorBuilder.writer = &x.buf
 	x.topologyLabelSelectorBuilder.scratch = x.scratch
